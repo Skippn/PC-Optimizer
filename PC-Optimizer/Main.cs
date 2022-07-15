@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Windows.Forms;
 
 namespace Optimizer
@@ -10,6 +13,15 @@ namespace Optimizer
     {
         private bool dragging = false;
         private Point startPoint = new Point(0, 0);
+        enum RecycleFlags : int
+        {
+            SHRB_NOCONFIRMATION = 0x00000001, // Don't ask for confirmation
+            SHRB_NOPROGRESSUI = 0x00000001, // Don't show progress
+            SHRB_NOSOUND = 0x00000004 // Don't make sound when the action is executed
+        }
+        [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
+        static extern uint SHEmptyRecycleBin(IntPtr hwnd, string pszRootPath, RecycleFlags dwFlags);
+
         public Optimizer()
         {
             InitializeComponent();
@@ -165,6 +177,56 @@ namespace Optimizer
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void cleanRecycleBinButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                uint IsSuccess = SHEmptyRecycleBin(IntPtr.Zero, null, RecycleFlags.SHRB_NOCONFIRMATION);
+                MessageBox.Show("Successfully deleted items in the recycle bin!", "PC-Optimizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to delete items in the recycle bin!" + ex.Message, "PC-Optimizer", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
+        }
+
+        private void getSystemInfo_Click(object sender, EventArgs e)
+        {
+            textBox3.Text = "";
+
+            var sysWindows = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", null);
+            var sysWindowsVersion = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "DisplayVersion", null);
+            var sysOwner = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "RegisteredOwner", null);
+            var sysBrand = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemManufacturer", null);
+            var sysModelName = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemFamily", null);
+            var sysProductName = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemProductName", null);
+            var sysBoardBrand = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BaseBoardManufacturer", null);
+            var sysBoardProduct = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BaseBoardProduct", null);
+            var sysBoardVersion = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BaseBoardVersion", null);
+            var sysBiosBrand = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BIOSVendor", null);
+            var sysBiosVersion = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BIOSVersion", null);
+            var sysCPU = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0", "ProcessorNameString", null);
+
+
+            textBox3.Text +=    "Microsoft " + sysWindows + ", version " + sysWindowsVersion + Environment.NewLine + "System owner: " + sysOwner + Environment.NewLine
+                                + "System brand: " + sysBrand + Environment.NewLine + "System model: " + sysModelName + Environment.NewLine
+                                + "System product: " + sysProductName + Environment.NewLine + "Motherboard brand: " + sysBoardBrand + Environment.NewLine
+                                + "Motherboard model: " + sysBoardProduct + Environment.NewLine + "Motherboard version: " + sysBoardVersion + Environment.NewLine
+                                + "Bios brand: " + sysBiosBrand + Environment.NewLine + "Bios version: " + sysBiosVersion + Environment.NewLine + "CPU: " + sysCPU + Environment.NewLine
+                                + "";
+        }
+
+        private void getHWIDButton_Click(object sender, EventArgs e)
+        {
+            textBox3.Text = "";
+
+            var sysDrive1HWID = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\Scsi\Scsi Port 0\Scsi Bus 1\Target Id 0\Logical Unit Id 0", "SerialNumber", null);
+            var sysDrive2HWID = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\Scsi\Scsi Port 0\Scsi Bus 2\Target Id 0\Logical Unit Id 0", "SerialNumber", null);
+            var sysUserHWID = WindowsIdentity.GetCurrent().User.Value;
+
+            textBox3.Text += "Drive C HWID: " + sysDrive1HWID + Environment.NewLine + "Drive D HWID: " + sysDrive2HWID + Environment.NewLine + "System User HWID: " + sysUserHWID;
         }
     }
 }

@@ -42,6 +42,7 @@
             this.getSystemInfo = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.getHWIDButton = new System.Windows.Forms.Button();
+            this.shutDownButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // brandLabel
@@ -204,10 +205,22 @@
             this.getHWIDButton.UseVisualStyleBackColor = true;
             this.getHWIDButton.Click += new System.EventHandler(this.getHWIDButton_Click);
             // 
+            // shutDownButton
+            // 
+            this.shutDownButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.shutDownButton.Location = new System.Drawing.Point(219, 195);
+            this.shutDownButton.Name = "shutDownButton";
+            this.shutDownButton.Size = new System.Drawing.Size(169, 53);
+            this.shutDownButton.TabIndex = 14;
+            this.shutDownButton.Text = "Shut Down";
+            this.shutDownButton.UseVisualStyleBackColor = true;
+            this.shutDownButton.Click += new System.EventHandler(this.shutDownButton_Click);
+            // 
             // Optimizer
             // 
             this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ClientSize = new System.Drawing.Size(1010, 675);
+            this.Controls.Add(this.shutDownButton);
             this.Controls.Add(this.getHWIDButton);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.getSystemInfo);
@@ -249,6 +262,7 @@
         private System.Windows.Forms.Button getSystemInfo;
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Button getHWIDButton;
+        private System.Windows.Forms.Button shutDownButton;
     }
 }
 

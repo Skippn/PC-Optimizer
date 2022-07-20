@@ -1,10 +1,14 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Optimizer
@@ -197,6 +201,7 @@ namespace Optimizer
             textBox3.Text = "";
 
             var sysWindows = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", null);
+            var sysUserName = WindowsIdentity.GetCurrent().Name.ToString();
             var sysWindowsVersion = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "DisplayVersion", null);
             var sysOwner = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "RegisteredOwner", null);
             var sysBrand = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "SystemManufacturer", null);
@@ -209,24 +214,86 @@ namespace Optimizer
             var sysBiosVersion = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\BIOS", "BIOSVersion", null);
             var sysCPU = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DESCRIPTION\System\CentralProcessor\0", "ProcessorNameString", null);
 
+            Process process = new Process();
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = "/C wmic path win32_VideoController get name";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardInput = true;
+            process.Start();
+            string hwid = "";
+            string sysGPU = "";
+            while (!process.HasExited)
+            {
+                hwid += process.StandardOutput.ReadToEnd();
+                sysGPU = hwid.Substring(4);
+            }
 
-            textBox3.Text +=    "Microsoft " + sysWindows + ", version " + sysWindowsVersion + Environment.NewLine + "System owner: " + sysOwner + Environment.NewLine
+
+            textBox3.Text += "Microsoft " + sysWindows + ", version " + sysWindowsVersion + Environment.NewLine + "System User Name: " + sysUserName + Environment.NewLine
+                                 + "System owner: " + sysOwner + Environment.NewLine
                                 + "System brand: " + sysBrand + Environment.NewLine + "System model: " + sysModelName + Environment.NewLine
                                 + "System product: " + sysProductName + Environment.NewLine + "Motherboard brand: " + sysBoardBrand + Environment.NewLine
                                 + "Motherboard model: " + sysBoardProduct + Environment.NewLine + "Motherboard version: " + sysBoardVersion + Environment.NewLine
                                 + "Bios brand: " + sysBiosBrand + Environment.NewLine + "Bios version: " + sysBiosVersion + Environment.NewLine + "CPU: " + sysCPU + Environment.NewLine
-                                + "";
+                                + "GPU: " + sysGPU;
         }
 
         private void getHWIDButton_Click(object sender, EventArgs e)
         {
             textBox3.Text = "";
 
-            var sysDrive1HWID = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\Scsi\Scsi Port 0\Scsi Bus 1\Target Id 0\Logical Unit Id 0", "SerialNumber", null);
-            var sysDrive2HWID = Registry.GetValue(@"HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\Scsi\Scsi Port 0\Scsi Bus 2\Target Id 0\Logical Unit Id 0", "SerialNumber", null);
+            /*Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                WindowStyle = ProcessWindowStyle.Normal,
+                FileName = "cmd.exe",
+                Arguments = "/c wmic diskdrive get serialnumber"
+            };
+            process.StartInfo = startInfo;
+            process.Start();*/
+
+            Process process = new Process();
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = "/C wmic diskdrive get serialnumber";
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardInput = true;
+            process.Start();
+            string hwid = "";
+            string hwid2 = "";
+            while (!process.HasExited)
+            {
+                hwid += process.StandardOutput.ReadToEnd();
+                hwid2 = hwid.Substring(12);
+            }
+
             var sysUserHWID = WindowsIdentity.GetCurrent().User.Value;
 
-            textBox3.Text += "Drive C HWID: " + sysDrive1HWID + Environment.NewLine + "Drive D HWID: " + sysDrive2HWID + Environment.NewLine + "System User HWID: " + sysUserHWID;
+            textBox3.Text += "Drive HWID: " + hwid2 + "System User HWID: " + sysUserHWID + Environment.NewLine;
+        }
+
+        private void shutDownButton_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are you sure you that you want to shut down the PC?", "PC-Optimizer", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                ProcessStartInfo processInfo = new ProcessStartInfo();
+                processInfo.FileName = "powershell.exe";
+                processInfo.Arguments = "Stop-Computer";
+                processInfo.RedirectStandardError = true;
+                processInfo.RedirectStandardOutput = true;
+                processInfo.UseShellExecute = false;
+                processInfo.CreateNoWindow = true;
+
+                Process process = new Process();
+                process.StartInfo = processInfo;
+                process.Start();
+            }
         }
     }
 }

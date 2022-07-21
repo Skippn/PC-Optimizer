@@ -43,7 +43,6 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.getHWIDButton = new System.Windows.Forms.Button();
             this.shutDownButton = new System.Windows.Forms.Button();
-            this.restartButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // brandLabel
@@ -209,7 +208,7 @@
             // shutDownButton
             // 
             this.shutDownButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.shutDownButton.Location = new System.Drawing.Point(22, 352);
+            this.shutDownButton.Location = new System.Drawing.Point(219, 195);
             this.shutDownButton.Name = "shutDownButton";
             this.shutDownButton.Size = new System.Drawing.Size(169, 53);
             this.shutDownButton.TabIndex = 14;
@@ -217,22 +216,10 @@
             this.shutDownButton.UseVisualStyleBackColor = true;
             this.shutDownButton.Click += new System.EventHandler(this.shutDownButton_Click);
             // 
-            // restartButton
-            // 
-            this.restartButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.restartButton.Location = new System.Drawing.Point(219, 352);
-            this.restartButton.Name = "restartButton";
-            this.restartButton.Size = new System.Drawing.Size(169, 53);
-            this.restartButton.TabIndex = 15;
-            this.restartButton.Text = "Restart";
-            this.restartButton.UseVisualStyleBackColor = true;
-            this.restartButton.Click += new System.EventHandler(this.restartButton_Click);
-            // 
             // Optimizer
             // 
             this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ClientSize = new System.Drawing.Size(1010, 675);
-            this.Controls.Add(this.restartButton);
             this.Controls.Add(this.shutDownButton);
             this.Controls.Add(this.getHWIDButton);
             this.Controls.Add(this.textBox3);
@@ -276,7 +263,6 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Button getHWIDButton;
         private System.Windows.Forms.Button shutDownButton;
-        private System.Windows.Forms.Button restartButton;
     }
 }
 

@@ -245,6 +245,16 @@ namespace Optimizer
         {
             textBox3.Text = "";
 
+            /*Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                WindowStyle = ProcessWindowStyle.Normal,
+                FileName = "cmd.exe",
+                Arguments = "/c wmic diskdrive get serialnumber"
+            };
+            process.StartInfo = startInfo;
+            process.Start();*/
+
             Process process = new Process();
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.FileName = "cmd.exe";
@@ -282,23 +292,6 @@ namespace Optimizer
 
                 Process process = new Process();
                 process.StartInfo = processInfo;
-                process.Start();
-            }
-        }
-
-        private void restartButton_Click(object sender, EventArgs e)
-        {
-            DialogResult result = MessageBox.Show("Are you sure you that you want to restart the PC?", "PC-Optimizer", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-            {
-                Process process = new Process();
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.Arguments = "/C shutdown /r /f /t 0";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardInput = true;
                 process.Start();
             }
         }
